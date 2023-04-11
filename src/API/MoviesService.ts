@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export default class MoviesService {
-  static async getPopular() {
+  static async getPopular(query = 'popular') {
     const response = await axios.get(
-      `https://api.themoviedb.org/3/movie/popular?api_key=${import.meta.env.VITE_APP_APY_KEY}`,
+      `https://api.themoviedb.org/3/movie/${query}?api_key=${import.meta.env.VITE_APP_APY_KEY}`,
       {
         params: {
           language: 'en-US',
@@ -29,7 +29,7 @@ export default class MoviesService {
     return response;
   }
 
-  static async getModieById(id: string) {
+  static async getMovieById(id: string) {
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_APP_APY_KEY}`,
       {
@@ -41,7 +41,7 @@ export default class MoviesService {
     return response;
   }
 
-  static async getTrailerByModieId(id: number) {
+  static async getTrailerByMovieId(id: number) {
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${import.meta.env.VITE_APP_APY_KEY}`,
       {
@@ -53,7 +53,7 @@ export default class MoviesService {
     return response;
   }
 
-  static async getActorsByModieId(id: number) {
+  static async getActorsByMovieId(id: number) {
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${
         import.meta.env.VITE_APP_APY_KEY
@@ -68,5 +68,5 @@ export default class MoviesService {
   }
 }
 
-export type TGetPopular = typeof MoviesService.getPopular;
-export type TSearchMovie = typeof MoviesService.searchMovie;
+// export type TGetPopular = typeof MoviesService.getPopular;
+// export type TSearchMovie = typeof MoviesService.searchMovie;

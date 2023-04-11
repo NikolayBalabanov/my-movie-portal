@@ -1,30 +1,24 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { IDetailedMovie } from '../models/movie';
 import Loader from '../components/Loader';
-import MoviesService from '../API/MoviesService';
-import MovieActorsList from '../components/Movie/MovieActorsList';
-import { useFetching } from '../hooks/useFetching';
+import { useActions } from '../hooks/useActions';
 import ErrorMessage from '../components/ErrorMessage';
 import { BIG_IMG, PLACEHOLDER_IMG } from '../utils/consts';
+import { useTypedSelector } from '../hooks/useTypedSelector';
 import { ButtonTrailer } from '../components/UI/ButtonTrailer';
+import MovieActorsList from '../components/Movie/MovieActorsList';
 
 interface MoviePageParams {
   [n: string]: string;
 }
 
 export const DetailsMovie: FC = () => {
+  const { getMovieById } = useActions();
+  const { movie, movieError, isLoading } = useTypedSelector((state) => state.movie);
   const params = useParams<MoviePageParams>();
-  const [movie, setMovie] = useState<IDetailedMovie>();
-  const { fetching, isLoading, error } = useFetching(async () => {
-    const response = await MoviesService.getModieById(params.id!);
-    setMovie(response.data);
-  });
-
   useEffect(() => {
-    fetching();
+    getMovieById(params.id!);
   }, []);
-
   const getPosterImg = () => {
     if (movie) {
       return movie.poster_path ? BIG_IMG + movie.poster_path : PLACEHOLDER_IMG;
@@ -34,7 +28,7 @@ export const DetailsMovie: FC = () => {
   return (
     <div className="container mx-auto p-10">
       {isLoading && <Loader />}
-      {error && <ErrorMessage content={error} />}
+      {movieError && <ErrorMessage content={movieError} />}
       {movie && (
         <div className="grid lg:grid-cols-3 grid-cols-1 gap-4 place-content-center">
           <div className="col-span-1 flex justify-center">

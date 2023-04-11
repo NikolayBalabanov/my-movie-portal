@@ -1,58 +1,55 @@
 import React, { FC, useEffect, useState } from 'react';
-import { SearchForm } from '../components/Search/SearchForm';
-import { useFetching } from '../hooks/useFetching';
-import MoviesService from '../API/MoviesService';
-import { IMovie } from '../models/movie';
-import MovieCard from '../components/Movie/MovieCard';
+import { useActions } from '../hooks/useActions';
 import Loader from '../components/Loader';
-import ErrorMessage from '../components/ErrorMessage';
+import Select from '../components/UI/Select/Select';
 import EmptyResult from '../components/EmptyResult';
+import MovieCard from '../components/Movie/MovieCard';
+import ErrorMessage from '../components/ErrorMessage';
+import { EMoviesFilter } from '../types/EMoviesFilter';
+import { SearchForm } from '../components/Search/SearchForm';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import { selectFieldsMovies } from '../utils/selectFieldsMovies';
 
 export const MoviesPage: FC = () => {
-  const [movies, setMovies] = useState<IMovie[]>([]);
+  const { movies, isLoading, error } = useTypedSelector((state) => state.movies);
+  const [filter, setFilter] = useState<EMoviesFilter>(EMoviesFilter.popular);
+  const { getMovies, searchMovies } = useActions();
+  const handleFilter = (e: EMoviesFilter) => {
+    getMovies(e);
+    setFilter(e);
+  };
   const handleSearch = (searchValue: string) => {
     window.scroll(0, 0);
     if (searchValue) {
-      searchedPosts(searchValue);
+      searchMovies(searchValue);
     } else {
-      fetchPosts();
+      getMovies();
     }
   };
-  const {
-    fetching: fetchPosts,
-    isLoading: isPostsLoading,
-    error: fetchError,
-  } = useFetching(async () => {
-    const response = await MoviesService.getPopular();
-    setMovies(response.data.results as IMovie[]);
-  });
-  const {
-    fetching: searchedPosts,
-    isLoading: isSearchedLoading,
-    error: searchedError,
-  } = useFetching(async () => {
-    const response = await MoviesService.searchMovie('');
-    setMovies(response.data.results as IMovie[]);
-  });
   useEffect(() => {
-    fetchPosts();
+    getMovies();
   }, []);
   return (
     <div className="container mx-auto">
-      <SearchForm placeholder="Search a movie..." onFormSubmit={(str) => handleSearch(str)} />
+      <div className="mx-auto max-w-2xl pt-5 flex gap-4 justify-around items-center sm:flex-row flex-col">
+        <SearchForm placeholder="Search a movie..." onFormSubmit={(str) => handleSearch(str)} />
+        <Select
+          selectFields={selectFieldsMovies}
+          current={filter}
+          onChange={(e) => handleFilter(e)}
+        />
+      </div>
       <div>
-        {(fetchError || searchedError) && <ErrorMessage content={fetchError || searchedError} />}
-        {isPostsLoading || isSearchedLoading ? (
-          <Loader />
-        ) : movies.length > 0 && !(fetchError || searchedError) ? (
+        {error && <ErrorMessage content={error} />}
+        {isLoading && <Loader />}
+        {movies.length > 0 && (
           <ul className="grid grid-flow-row gap-2 lg:grid-cols-4 p-4 sm:grid-cols-2 grid-cols-1">
             {movies.map((movie) => (
               <MovieCard movie={movie} key={movie.id} />
             ))}
           </ul>
-        ) : (
-          <EmptyResult />
         )}
+        {!isLoading && movies.length === 0 && <EmptyResult />}
       </div>
     </div>
   );

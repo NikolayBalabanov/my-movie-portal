@@ -10,7 +10,7 @@ export default function MovieCard({ movie }: IMovieCard) {
   return (
     <Link
       to={`/movie/${movie.id}`}
-      className="relative h-full flex flex-col justify-between p-2 gap-2 group bg-slate-800 shadow-md rounded-lg"
+      className="relative h-full flex flex-col justify-between p-2 gap-3 group bg-slate-800 shadow-md rounded-lg"
     >
       <span
         className={`absolute z-10 pointer-events-none -top-1 -right-1 p-1 flex w-10 h-10 items-center justify-center rounded-full ${
@@ -21,7 +21,7 @@ export default function MovieCard({ movie }: IMovieCard) {
       </span>
       <div className="overflow-hidden h-full rounded-lg relative ">
         <img
-          className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-500 aspect-auto"
+          className="card-img"
           src={`https://image.tmdb.org/t/p/original${
             movie.poster_path ? movie.poster_path : '/aEsAdMAhwKYFgnHHxMOknktQYKK.jpg'
           }`}

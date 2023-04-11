@@ -1,58 +1,36 @@
-import React, { FC, useEffect, useState } from 'react';
-import { IActor } from '../models/actor';
+import React, { FC, useEffect } from 'react';
 import Loader from '../components/Loader';
-import ActorsService from '../API/ActorsService';
-import { useFetching } from '../hooks/useFetching';
 import EmptyResult from '../components/EmptyResult';
 import ErrorMessage from '../components/ErrorMessage';
 import { SearchForm } from '../components/Search/SearchForm';
 import ActorCard from '../components/ActorCard';
+import { useActions } from '../hooks/useActions';
+import { useTypedSelector } from '../hooks/useTypedSelector';
 
 export const ActorsPage: FC = () => {
-  const [actors, setActors] = useState<IActor[]>([]);
+  const { getActors, searchActors } = useActions();
+  const { actors, error, isLoading } = useTypedSelector((state) => state.actors);
+  useEffect(() => {
+    getActors();
+  }, []);
   const handleSearch = (searchValue: string) => {
     window.scroll(0, 0);
-    if (searchValue) {
-      searchActors(searchValue);
-    } else {
-      fetchActors();
-    }
+    searchValue ? searchActors(searchValue) : getActors();
   };
-  const {
-    fetching: fetchActors,
-    isLoading: isPostsLoading,
-    error: fetchError,
-  } = useFetching(async () => {
-    const response = await ActorsService.getPopular();
-    setActors(response.data.results as IActor[]);
-  });
-  const {
-    fetching: searchActors,
-    isLoading: isSearchLoading,
-    error: searchedError,
-  } = useFetching(async () => {
-    const response = await ActorsService.searchActor('');
-    setActors(response.data.results as IActor[]);
-  });
-  useEffect(() => {
-    fetchActors();
-  }, []);
+  const actorsNodes = actors.map((actor) => <ActorCard key={actor.id} actor={actor} />);
+
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto pt-5">
       <SearchForm placeholder="Search an actor..." onFormSubmit={(str) => handleSearch(str)} />
       <div>
-        {(fetchError || searchedError) && <ErrorMessage content={fetchError || searchedError} />}
-        {isPostsLoading || isSearchLoading ? (
-          <Loader />
-        ) : actors.length > 0 && !(fetchError || searchedError) ? (
+        {error && <ErrorMessage content={error} />}
+        {isLoading && <Loader />}
+        {actors.length > 0 && (
           <ul className="grid grid-flow-row gap-2 lg:grid-cols-4 p-4 sm:grid-cols-2 grid-cols-1">
-            {actors.map((actor) => (
-              <ActorCard key={actor.id} actor={actor} />
-            ))}
+            {actorsNodes}
           </ul>
-        ) : (
-          <EmptyResult />
         )}
+        {actors.length === 0 && !isLoading && <EmptyResult />}
       </div>
     </div>
   );

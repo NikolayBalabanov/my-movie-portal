@@ -1,26 +1,21 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Loader from '../components/Loader';
-import { IActorDetails } from '../models/actor';
-import ActorsService from '../API/ActorsService';
-import { useFetching } from '../hooks/useFetching';
-import ErrorMessage from '../components/ErrorMessage';
 import { BIG_IMG, PLACEHOLDER_IMG } from '../utils/consts';
+import { useActions } from '../hooks/useActions';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import ErrorMessage from '../components/ErrorMessage';
 
 interface DetailsActorPageParams {
   [n: string]: string;
 }
 
 export const DetailsActor: FC = () => {
+  const { getActor } = useActions();
+  const { actor, error, isLoading } = useTypedSelector((state) => state.actor);
   const params = useParams<DetailsActorPageParams>();
-  const [actor, setActor] = useState<IActorDetails>();
-  const { fetching, isLoading, error } = useFetching(async () => {
-    const response = await ActorsService.getActorById(`${params.id}`);
-    setActor(response.data);
-  });
-
   useEffect(() => {
-    fetching();
+    getActor(`${params.id}`);
   }, []);
 
   const getPosterImg = () => {

@@ -25,11 +25,11 @@ export const SearchForm: FC<ISearchForm> = ({ onFormSubmit, placeholder }) => {
     setValue('');
   };
   return (
-    <div className="flex mx-auto max-w-2xl pt-5 justify-center">
+    <div className="flex justify-center">
       <form className="flex gap-3" onSubmit={(event) => handleSubmit(event)}>
         <div className="relative sm:w-auto w-full">
           <input
-            className="border self-center rounded py-2 px-4 w-full"
+            className="border self-center rounded py-2 px-4 w-full bg-slate-200"
             type="text"
             value={value}
             onChange={(e) => handleChange(e)}

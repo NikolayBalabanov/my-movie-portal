@@ -43,9 +43,9 @@ export const MoviesPage: FC = () => {
         {error && <ErrorMessage content={error} />}
         {isLoading && <Loader />}
         {movies.length > 0 && (
-          <ul className="grid grid-flow-row gap-2 lg:grid-cols-4 p-4 sm:grid-cols-2 grid-cols-1">
+          <ul className="grid grid-flow-row gap-2 xl:grid-cols-6 md:grid-cols-4 p-4 sm:grid-cols-3 grid-cols-2">
             {movies.map((movie) => (
-              <MovieCard movie={movie} key={movie.id} />
+              <MovieCard movie={movie} isListItem={false} key={movie.id} />
             ))}
           </ul>
         )}

@@ -3,7 +3,7 @@ import Loader from '../components/Loader';
 import EmptyResult from '../components/EmptyResult';
 import ErrorMessage from '../components/ErrorMessage';
 import { SearchForm } from '../components/Search/SearchForm';
-import ActorCard from '../components/ActorCard';
+import ActorCard from '../components/Actor/ActorCard';
 import { useActions } from '../hooks/useActions';
 import { useTypedSelector } from '../hooks/useTypedSelector';
 
@@ -17,7 +17,9 @@ export const ActorsPage: FC = () => {
     window.scroll(0, 0);
     searchValue ? searchActors(searchValue) : getActors();
   };
-  const actorsNodes = actors.map((actor) => <ActorCard key={actor.id} actor={actor} />);
+  const actorsNodes = actors.map((actor) => (
+    <ActorCard key={actor.id} imgPath={actor.profile_path} actorId={actor.id} name={actor.name} />
+  ));
 
   return (
     <div className="container mx-auto pt-5">
@@ -26,7 +28,7 @@ export const ActorsPage: FC = () => {
         {error && <ErrorMessage content={error} />}
         {isLoading && <Loader />}
         {actors.length > 0 && (
-          <ul className="grid grid-flow-row gap-2 lg:grid-cols-4 p-4 sm:grid-cols-2 grid-cols-1">
+          <ul className="grid grid-flow-row gap-2 xl:grid-cols-6 md:grid-cols-4 p-4 sm:grid-cols-3 grid-cols-2">
             {actorsNodes}
           </ul>
         )}

@@ -24,7 +24,7 @@ export const getActor = (actorId: string) => {
     try {
       dispatch({ type: EActionTypes.FETCH_ACTOR });
       const response = await ActorsService.getActorById(actorId);
-      const actor: IActorDetails = response.data.results;
+      const actor: IActorDetails = response.data;
       dispatch({ type: EActionTypes.FETCH_ACTOR_SUCCESS, payload: actor });
     } catch (e) {
       dispatch({

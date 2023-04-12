@@ -74,6 +74,9 @@ export const rootReducer: Reducer<IRootState, TRootAction> = (
     case EActionTypes.FETCH_ACTOR:
     case EActionTypes.FETCH_ACTOR_SUCCESS:
     case EActionTypes.FETCH_ACTOR_ERROR:
+    case EActionTypes.FETCH_ACTOR_MOVIES:
+    case EActionTypes.FETCH_ACTOR_MOVIES_SUCCESS:
+    case EActionTypes.FETCH_ACTOR_MOVIES_ERROR:
       return {
         ...state,
         actor: actorReducer(state.actor, action),

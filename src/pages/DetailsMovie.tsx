@@ -17,7 +17,7 @@ export const DetailsMovie: FC = () => {
   const { movie, movieError, isLoading } = useTypedSelector((state) => state.movie);
   const params = useParams<MoviePageParams>();
   useEffect(() => {
-    getMovieById(params.id!);
+    getMovieById(`${params.id}`);
   }, []);
   const getPosterImg = () => {
     if (movie) {

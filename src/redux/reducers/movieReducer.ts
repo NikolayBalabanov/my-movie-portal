@@ -35,7 +35,12 @@ export const movieReducer: Reducer<IMovieState, TMovieReducerAction> = (
   switch (action.type) {
     case EActionTypes.FETCH_MOVIE:
       return {
-        ...initialMovieState,
+        movie: null,
+        movieActors: [],
+        trailerLink: '',
+        movieActorsError: '',
+        trailerLinkError: '',
+        movieError: '',
         isLoading: true,
       };
     case EActionTypes.FETCH_MOVIE_SUCCESS:
@@ -48,8 +53,9 @@ export const movieReducer: Reducer<IMovieState, TMovieReducerAction> = (
     case EActionTypes.FETCH_MOVIE_ERROR:
       return { ...initialMovieState, movieError: action.payload };
     case EActionTypes.FETCH_MOVIE_ACTORS:
+      return { ...state, movieActors: [] };
     case EActionTypes.FETCH_TRAILER:
-      return state;
+      return { ...state, trailerLink: '' };
     case EActionTypes.FETCH_MOVIE_ACTORS_SUCCESS:
       return { ...state, movieActors: action.payload };
     case EActionTypes.FETCH_TRAILER_SUCCESS:

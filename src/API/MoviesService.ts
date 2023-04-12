@@ -38,6 +38,7 @@ export default class MoviesService {
         },
       }
     );
+    console.log('RESPONSE', response);
     return response;
   }
 

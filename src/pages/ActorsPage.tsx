@@ -43,7 +43,9 @@ export const ActorsPage: FC = () => {
         )}
         {actors.length === 0 && !isLoading && <EmptyResult />}
       </div>
-      <PaginationBoard onPaginate={handlePaginate} page={+page} totalPages={totalPages} />
+      {actors.length !== 0 && (
+        <PaginationBoard onPaginate={handlePaginate} page={+page} totalPages={totalPages} />
+      )}
     </div>
   );
 };

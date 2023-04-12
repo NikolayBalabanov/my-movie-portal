@@ -1,29 +1,38 @@
 import React, { FC, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Loader from '../components/Loader';
+import { useActions } from '../hooks/useActions';
 import EmptyResult from '../components/EmptyResult';
+import ActorCard from '../components/Actor/ActorCard';
 import ErrorMessage from '../components/ErrorMessage';
 import { SearchForm } from '../components/Search/SearchForm';
-import ActorCard from '../components/Actor/ActorCard';
-import { useActions } from '../hooks/useActions';
 import { useTypedSelector } from '../hooks/useTypedSelector';
+import { PaginationBoard } from '../components/PaginationBoard';
 
 export const ActorsPage: FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = searchParams.get('page') || '1';
+  const searchActor = searchParams.get('search-actor') || '';
   const { getActors, searchActors } = useActions();
-  const { actors, error, isLoading } = useTypedSelector((state) => state.actors);
-  useEffect(() => {
-    getActors();
-  }, []);
-  const handleSearch = (searchValue: string) => {
-    window.scroll(0, 0);
-    searchValue ? searchActors(searchValue) : getActors();
+  const { actors, error, isLoading, totalPages } = useTypedSelector((state) => state.actors);
+  const handlePaginate = (event: React.ChangeEvent<unknown>, value: number) => {
+    searchParams.set('page', value.toString());
+    setSearchParams(searchParams);
   };
+  useEffect(() => {
+    if (searchActor) {
+      searchActors(searchActor, +page);
+    } else {
+      getActors(+page);
+    }
+  }, [page, searchActor]);
   const actorsNodes = actors.map((actor) => (
     <ActorCard key={actor.id} imgPath={actor.profile_path} actorId={actor.id} name={actor.name} />
   ));
 
   return (
     <div className="container mx-auto pt-5">
-      <SearchForm placeholder="Search an actor..." onFormSubmit={(str) => handleSearch(str)} />
+      <SearchForm placeholder="Search an actor..." mode="search-actor" />
       <div>
         {error && <ErrorMessage content={error} />}
         {isLoading && <Loader />}
@@ -34,6 +43,7 @@ export const ActorsPage: FC = () => {
         )}
         {actors.length === 0 && !isLoading && <EmptyResult />}
       </div>
+      <PaginationBoard onPaginate={handlePaginate} page={+page} totalPages={totalPages} />
     </div>
   );
 };

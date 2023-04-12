@@ -9,7 +9,7 @@ interface ISearchMovies {
 
 interface ISearchMoviesSuccess {
   type: EActionTypes.SEARCH_MOVIES_SUCCESS;
-  payload: IMovie[];
+  payload: { totalPages: number; movies: IMovie[] };
 }
 
 interface ISearchMoviesError {
@@ -19,13 +19,17 @@ interface ISearchMoviesError {
 
 export type TSearchMovies = ISearchMovies | ISearchMoviesSuccess | ISearchMoviesError;
 
-export const searchMovies = (search: string) => {
+export const searchMovies = (search: string, page: number) => {
   return async (dispatch: Dispatch<AnyAction>) => {
     try {
       dispatch({ type: EActionTypes.SEARCH_MOVIES });
-      const response = await MoviesService.searchMovie(search);
+      const response = await MoviesService.searchMovie(search, page);
       const movies: IMovie[] = response.data.results;
-      dispatch({ type: EActionTypes.SEARCH_MOVIES_SUCCESS, payload: movies });
+      const totalPages: number = response.data.total_pages;
+      dispatch({
+        type: EActionTypes.FETCH_MOVIES_SUCCESS,
+        payload: { totalPages: totalPages < 501 ? totalPages : 500, movies },
+      });
     } catch (e) {
       dispatch({
         type: EActionTypes.SEARCH_MOVIES_ERROR,

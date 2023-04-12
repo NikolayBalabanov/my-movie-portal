@@ -7,12 +7,14 @@ import { TSearchMovies } from '../actions/movies.ac/searchMovies';
 export interface IMoviesState {
   movies: IMovie[];
   isLoading: boolean;
+  totalPages: number;
   error: string;
 }
 
 export const initialMoviesState: IMoviesState = {
   movies: [],
   error: '',
+  totalPages: 0,
   isLoading: false,
 };
 
@@ -28,6 +30,7 @@ export const moviesReducer: Reducer<IMoviesState, TMoviesReducerAction> = (
       return {
         movies: [],
         error: '',
+        totalPages: 0,
         isLoading: true,
       };
     case EActionTypes.FETCH_MOVIES_SUCCESS:
@@ -36,11 +39,12 @@ export const moviesReducer: Reducer<IMoviesState, TMoviesReducerAction> = (
         ...state,
         error: '',
         isLoading: false,
-        movies: action.payload,
+        movies: action.payload.movies,
+        totalPages: action.payload.totalPages,
       };
     case EActionTypes.FETCH_MOVIES_ERROR:
     case EActionTypes.SEARCH_MOVIES_ERROR:
-      return { movies: [], isLoading: false, error: action.payload };
+      return { movies: [], totalPages: 0, isLoading: false, error: action.payload };
     default:
       return state;
   }

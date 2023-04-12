@@ -1,24 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SelectItem from './SelectItem';
 import Icon, { EIcons } from '../Icon';
 import { TSelectFieldsMovies } from '../../../utils/selectFieldsMovies';
-import { EMoviesFilter } from 'types/EMoviesFilter';
+import { EMoviesFilter } from '../../../types/EMoviesFilter';
 
 interface ISelectProps {
-  current: EMoviesFilter;
-  onChange: (e: EMoviesFilter) => void;
   selectFields: TSelectFieldsMovies;
 }
 
-export default function Select({ current, onChange, selectFields }: ISelectProps) {
+export default function Select({ selectFields }: ISelectProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const current = searchParams.get('filter') || EMoviesFilter.popular;
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const fieldsArr = selectFields.filter((el) => el.value !== current);
   const targetField = selectFields.filter((el) => el.value === current)[0].text;
   const select = useRef<HTMLDivElement>(null);
   const isMounted = useRef(false);
   const handleClick = (value: EMoviesFilter) => {
-    onChange(value);
+    const newSearch = new URLSearchParams();
+    newSearch.set('filter', value);
     setIsOpen(false);
+    setSearchParams(newSearch);
   };
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,7 +38,9 @@ export default function Select({ current, onChange, selectFields }: ISelectProps
       <button
         type="button"
         className={`${
-          isOpen ? 'border-b border-b-colorGrey' : 'border-b border-transparent'
+          isOpen
+            ? 'border-b border-b-colorGrey rounded-t-lg'
+            : 'border-b border-transparent rounded-lg'
         } select-item`}
         onClick={() => setIsOpen(!isOpen)}
       >

@@ -9,7 +9,7 @@ interface ISearchActors {
 
 interface ISearchActorsSuccess {
   type: EActionTypes.SEARCH_ACTORS_SUCCESS;
-  payload: IActor[];
+  payload: { totalPages: number; actors: IActor[] };
 }
 
 interface ISearchActorsError {
@@ -25,7 +25,11 @@ export const searchActors = (query: string, page = 1) => {
       dispatch({ type: EActionTypes.SEARCH_ACTORS });
       const response = await ActorsService.searchActor(query, page);
       const actors: IActor[] = response.data.results;
-      dispatch({ type: EActionTypes.SEARCH_ACTORS_SUCCESS, payload: actors });
+      const totalPages: number = response.data.total_pages;
+      dispatch({
+        type: EActionTypes.SEARCH_ACTORS_SUCCESS,
+        payload: { actors, totalPages: totalPages < 501 ? totalPages : 500 },
+      });
     } catch (e) {
       dispatch({
         type: EActionTypes.SEARCH_ACTORS_ERROR,

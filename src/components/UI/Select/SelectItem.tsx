@@ -9,7 +9,7 @@ interface ISelectItem {
 
 export default function SelectItem({ onChooseFilter, value, text }: ISelectItem) {
   return (
-    <button type="button" className="select-item" onClick={() => onChooseFilter(value)}>
+    <button type="button" className="select-item dropped" onClick={() => onChooseFilter(value)}>
       <span>{text}</span>
     </button>
   );

@@ -1,27 +1,46 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { ButtonSubmit } from '../UI/ButtonSubmit';
 import SearchClear from './SearchClear';
 import SearchIncon from './SearchIncon';
+import { useSearchParams } from 'react-router-dom';
 
 interface ISearchForm {
-  onFormSubmit: (reqStr: string) => void;
   placeholder: string;
+  mode: 'search-movie' | 'search-actor';
 }
 
-export const SearchForm: FC<ISearchForm> = ({ onFormSubmit, placeholder }) => {
+export const SearchForm: FC<ISearchForm> = ({ placeholder, mode }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get(mode || '');
   const [value, setValue] = useState<string>('');
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
+  useEffect(() => {
+    const filter = searchParams.get('filter');
+    const page = searchParams.get('page');
+    if (filter) setValue('');
+    if (search || filter || page) return;
+  }, [search]);
+  const applySearchParams = (searchValue: string) => {
+    searchParams.delete('page');
+    searchParams.delete('filter');
+    if (!searchValue) {
+      searchParams.delete('search-actor');
+      searchParams.delete('search-movie');
+    } else {
+      searchParams.set(mode, searchValue);
+    }
+    setSearchParams(searchParams);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onFormSubmit(value);
-    setValue('');
+    applySearchParams(value);
   };
 
   const handleClear = () => {
-    onFormSubmit('');
+    applySearchParams('');
     setValue('');
   };
   return (

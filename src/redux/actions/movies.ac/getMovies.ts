@@ -2,7 +2,6 @@ import { Dispatch } from 'redux';
 import MoviesService from '../../../API/MoviesService';
 import { IMovie } from '../../../models/movie';
 import { EActionTypes } from '../../../types/EActionTypes';
-import { EMoviesFilter } from '../../../types/EMoviesFilter';
 import { TRootAction } from '../../../redux/rootReducer';
 
 interface IFetchMovies {
@@ -11,7 +10,7 @@ interface IFetchMovies {
 
 interface IFetchMoviesSuccess {
   type: EActionTypes.FETCH_MOVIES_SUCCESS;
-  payload: IMovie[];
+  payload: { totalPages: number; movies: IMovie[] };
 }
 
 interface IFetchMoviesError {
@@ -21,13 +20,17 @@ interface IFetchMoviesError {
 
 export type TMovies = IFetchMovies | IFetchMoviesSuccess | IFetchMoviesError;
 
-export const getMovies = (query = EMoviesFilter.popular) => {
+export const getMovies = (query: string, page = 1) => {
   return async (dispatch: Dispatch<TRootAction>) => {
     try {
       dispatch({ type: EActionTypes.FETCH_MOVIES });
-      const response = await MoviesService.getPopular(query);
+      const response = await MoviesService.getPopular(query, page);
       const movies: IMovie[] = response.data.results;
-      dispatch({ type: EActionTypes.FETCH_MOVIES_SUCCESS, payload: movies });
+      const totalPages: number = response.data.total_pages;
+      dispatch({
+        type: EActionTypes.FETCH_MOVIES_SUCCESS,
+        payload: { totalPages: totalPages < 501 ? totalPages : 500, movies },
+      });
     } catch (e) {
       dispatch({
         type: EActionTypes.FETCH_MOVIES_ERROR,

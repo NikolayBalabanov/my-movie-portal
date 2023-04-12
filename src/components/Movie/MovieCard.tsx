@@ -20,7 +20,7 @@ export default function MovieCard({ movie, isListItem }: IMovieCard) {
       <span
         className={`absolute z-10 pointer-events-none -top-1 -right-1 p-1 flex md:w-10 md:h-10 h-6 w-6 items-center justify-center rounded-full ${
           movie.vote_average > 6 ? 'bg-green-500' : 'bg-red-500 '
-        }${isListItem && ' hidden'}`}
+        } ${isListItem && ' hidden'}`}
       >
         {movie.vote_average.toFixed(1)}
       </span>

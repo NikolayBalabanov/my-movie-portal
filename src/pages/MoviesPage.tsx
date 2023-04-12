@@ -49,7 +49,7 @@ export const MoviesPage: FC = () => {
         )}
         {!isLoading && movies.length === 0 && <EmptyResult />}
       </div>
-      {totalPages > 0 && (
+      {movies.length !== 0 && (
         <PaginationBoard onPaginate={handlePaginate} page={+page} totalPages={totalPages} />
       )}
     </div>

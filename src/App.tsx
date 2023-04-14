@@ -6,20 +6,24 @@ import { MoviesPage } from './pages/MoviesPage';
 import { DetailsMovie } from './pages/DetailsMovie';
 import { ActorsPage } from './pages/ActorsPage';
 import { DetailsActor } from './pages/DetailsActor';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <Routes>
-        <Route path="/" element={<MoviesPage />} />
-        <Route path="/movies" element={<MoviesPage />} />
-        <Route path="/actors" element={<ActorsPage />} />
-        <Route path="/movie/:id" element={<DetailsMovie />} />
-        <Route path="/actor/:id" element={<DetailsActor />} />
-        <Route path="/*" element={<NeverPage />} />
-      </Routes>
-    </div>
+    <Provider store={store}>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<MoviesPage />} />
+          <Route path="/movies" element={<MoviesPage />} />
+          <Route path="/actors" element={<ActorsPage />} />
+          <Route path="/movie/:id" element={<DetailsMovie />} />
+          <Route path="/actor/:id" element={<DetailsActor />} />
+          <Route path="/*" element={<NeverPage />} />
+        </Routes>
+      </div>
+    </Provider>
   );
 }
 

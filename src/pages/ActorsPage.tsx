@@ -1,59 +1,51 @@
-import React, { FC, useEffect, useState } from 'react';
-import { IActor } from '../models/actor';
+import React, { FC, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Loader from '../components/Loader';
-import ActorsService from '../API/ActorsService';
-import { useFetching } from '../hooks/useFetching';
+import { useActions } from '../hooks/useActions';
 import EmptyResult from '../components/EmptyResult';
+import ActorCard from '../components/Actor/ActorCard';
 import ErrorMessage from '../components/ErrorMessage';
 import { SearchForm } from '../components/Search/SearchForm';
-import ActorCard from '../components/ActorCard';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import { PaginationBoard } from '../components/PaginationBoard';
 
 export const ActorsPage: FC = () => {
-  const [actors, setActors] = useState<IActor[]>([]);
-  const handleSearch = (searchValue: string) => {
-    window.scroll(0, 0);
-    if (searchValue) {
-      searchActors(searchValue);
-    } else {
-      fetchActors();
-    }
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = searchParams.get('page') || '1';
+  const searchActor = searchParams.get('search-actor') || '';
+  const { getActors, searchActors } = useActions();
+  const { actors, error, isLoading, totalPages } = useTypedSelector((state) => state.actors);
+  const handlePaginate = (event: React.ChangeEvent<unknown>, value: number) => {
+    searchParams.set('page', value.toString());
+    setSearchParams(searchParams);
   };
-  const {
-    fetching: fetchActors,
-    isLoading: isPostsLoading,
-    error: fetchError,
-  } = useFetching(async () => {
-    const response = await ActorsService.getPopular();
-    setActors(response.data.results as IActor[]);
-  });
-  const {
-    fetching: searchActors,
-    isLoading: isSearchLoading,
-    error: searchedError,
-  } = useFetching(async () => {
-    const response = await ActorsService.searchActor('');
-    setActors(response.data.results as IActor[]);
-  });
   useEffect(() => {
-    fetchActors();
-  }, []);
+    if (searchActor) {
+      searchActors(searchActor, +page);
+    } else {
+      getActors(+page);
+    }
+  }, [page, searchActor]);
+  const actorsNodes = actors.map((actor) => (
+    <ActorCard key={actor.id} imgPath={actor.profile_path} actorId={actor.id} name={actor.name} />
+  ));
+
   return (
-    <div className="container mx-auto">
-      <SearchForm placeholder="Search an actor..." onFormSubmit={(str) => handleSearch(str)} />
+    <div className="container mx-auto pt-5">
+      <SearchForm placeholder="Search an actor..." mode="search-actor" />
       <div>
-        {(fetchError || searchedError) && <ErrorMessage content={fetchError || searchedError} />}
-        {isPostsLoading || isSearchLoading ? (
-          <Loader />
-        ) : actors.length > 0 && !(fetchError || searchedError) ? (
-          <ul className="grid grid-flow-row gap-2 lg:grid-cols-4 p-4 sm:grid-cols-2 grid-cols-1">
-            {actors.map((actor) => (
-              <ActorCard key={actor.id} actor={actor} />
-            ))}
+        {error && <ErrorMessage content={error} />}
+        {isLoading && <Loader />}
+        {actors.length > 0 && (
+          <ul className="grid grid-flow-row gap-2 xl:grid-cols-6 md:grid-cols-4 p-4 sm:grid-cols-3 grid-cols-2">
+            {actorsNodes}
           </ul>
-        ) : (
-          <EmptyResult />
         )}
+        {actors.length === 0 && !isLoading && <EmptyResult />}
       </div>
+      {actors.length !== 0 && (
+        <PaginationBoard onPaginate={handlePaginate} page={+page} totalPages={totalPages} />
+      )}
     </div>
   );
 };

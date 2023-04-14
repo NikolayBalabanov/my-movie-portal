@@ -1,26 +1,22 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Loader from '../components/Loader';
-import { IActorDetails } from '../models/actor';
-import ActorsService from '../API/ActorsService';
-import { useFetching } from '../hooks/useFetching';
-import ErrorMessage from '../components/ErrorMessage';
 import { BIG_IMG, PLACEHOLDER_IMG } from '../utils/consts';
+import { useActions } from '../hooks/useActions';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import ErrorMessage from '../components/ErrorMessage';
+import ActorMiviesList from '../components/Actor/ActorMiviesList';
 
 interface DetailsActorPageParams {
   [n: string]: string;
 }
 
 export const DetailsActor: FC = () => {
+  const { getActor } = useActions();
+  const { actor, error, isLoading } = useTypedSelector((state) => state.actor);
   const params = useParams<DetailsActorPageParams>();
-  const [actor, setActor] = useState<IActorDetails>();
-  const { fetching, isLoading, error } = useFetching(async () => {
-    const response = await ActorsService.getActorById(`${params.id}`);
-    setActor(response.data);
-  });
-
   useEffect(() => {
-    fetching();
+    getActor(`${params.id}`);
   }, []);
 
   const getPosterImg = () => {
@@ -30,11 +26,11 @@ export const DetailsActor: FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-10">
+    <div className="container mx-auto p-10 md:py-5 md:px-2">
       {isLoading && <Loader />}
       {error && <ErrorMessage content={error} />}
       {actor && (
-        <div className="grid lg:grid-cols-3 grid-cols-1 gap-4 place-content-center">
+        <div className="grid xl:grid-cols-3 grid-cols-1 gap-4 place-content-center">
           <div className="col-span-1 flex justify-center">
             <img
               className="object-fill h-full lg:w-full w-2/3 rounded-lg bg-gray-400 aspect-auto shadow-xl shadow-black"
@@ -56,6 +52,7 @@ export const DetailsActor: FC = () => {
             </div>
             <p className="mb-3 rounded-lg ">{actor.biography}</p>
           </div>
+          <ActorMiviesList actorId={actor.id} />
         </div>
       )}
     </div>

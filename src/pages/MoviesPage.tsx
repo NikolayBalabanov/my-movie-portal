@@ -1,59 +1,57 @@
-import React, { FC, useEffect, useState } from 'react';
-import { SearchForm } from '../components/Search/SearchForm';
-import { useFetching } from '../hooks/useFetching';
-import MoviesService from '../API/MoviesService';
-import { IMovie } from '../models/movie';
-import MovieCard from '../components/Movie/MovieCard';
+import React, { FC, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Loader from '../components/Loader';
-import ErrorMessage from '../components/ErrorMessage';
+import { useActions } from '../hooks/useActions';
+import Select from '../components/UI/Select/Select';
 import EmptyResult from '../components/EmptyResult';
+import MovieCard from '../components/Movie/MovieCard';
+import ErrorMessage from '../components/ErrorMessage';
+import { EMoviesFilter } from '../types/EMoviesFilter';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import { SearchForm } from '../components/Search/SearchForm';
+import { PaginationBoard } from '../components/PaginationBoard';
+import { selectFieldsMovies } from '../utils/selectFieldsMovies';
 
 export const MoviesPage: FC = () => {
-  const [movies, setMovies] = useState<IMovie[]>([]);
-  const handleSearch = (searchValue: string) => {
-    window.scroll(0, 0);
-    if (searchValue) {
-      searchedPosts(searchValue);
-    } else {
-      fetchPosts();
-    }
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = searchParams.get('page') || '1';
+  const searchMovie = searchParams.get('search-movie') || '';
+  const filterQuery = searchParams.get('filter') || EMoviesFilter.popular;
+  const { movies, isLoading, error, totalPages } = useTypedSelector((state) => state.movies);
+  const { getMovies, searchMovies } = useActions();
+  const handlePaginate = (event: React.ChangeEvent<unknown>, value: number) => {
+    searchParams.set('page', value.toString());
+    setSearchParams(searchParams);
   };
-  const {
-    fetching: fetchPosts,
-    isLoading: isPostsLoading,
-    error: fetchError,
-  } = useFetching(async () => {
-    const response = await MoviesService.getPopular();
-    setMovies(response.data.results as IMovie[]);
-  });
-  const {
-    fetching: searchedPosts,
-    isLoading: isSearchedLoading,
-    error: searchedError,
-  } = useFetching(async () => {
-    const response = await MoviesService.searchMovie('');
-    setMovies(response.data.results as IMovie[]);
-  });
+  const moviesCards = movies.map((movie) => (
+    <MovieCard movie={movie} isListItem={false} key={movie.id} />
+  ));
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (searchMovie) {
+      searchMovies(searchMovie, +page);
+    } else {
+      getMovies(filterQuery, +page);
+    }
+  }, [searchMovie, page, filterQuery]);
   return (
     <div className="container mx-auto">
-      <SearchForm placeholder="Search a movie..." onFormSubmit={(str) => handleSearch(str)} />
-      <div>
-        {(fetchError || searchedError) && <ErrorMessage content={fetchError || searchedError} />}
-        {isPostsLoading || isSearchedLoading ? (
-          <Loader />
-        ) : movies.length > 0 && !(fetchError || searchedError) ? (
-          <ul className="grid grid-flow-row gap-2 lg:grid-cols-4 p-4 sm:grid-cols-2 grid-cols-1">
-            {movies.map((movie) => (
-              <MovieCard movie={movie} key={movie.id} />
-            ))}
-          </ul>
-        ) : (
-          <EmptyResult />
-        )}
+      <div className="mx-auto max-w-2xl pt-5 flex gap-4 justify-around items-center sm:flex-row flex-col">
+        <SearchForm placeholder="Search a movie..." mode="search-movie" />
+        <Select selectFields={selectFieldsMovies} />
       </div>
+      <div>
+        {error && <ErrorMessage content={error} />}
+        {isLoading && <Loader />}
+        {movies.length > 0 && (
+          <ul className="grid grid-flow-row gap-2 xl:grid-cols-6 md:grid-cols-4 p-4 sm:grid-cols-3 grid-cols-2">
+            {moviesCards}
+          </ul>
+        )}
+        {!isLoading && movies.length === 0 && <EmptyResult />}
+      </div>
+      {movies.length !== 0 && (
+        <PaginationBoard onPaginate={handlePaginate} page={+page} totalPages={totalPages} />
+      )}
     </div>
   );
 };

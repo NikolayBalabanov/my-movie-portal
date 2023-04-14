@@ -40,6 +40,20 @@ export default class ActorsService {
     );
     return response;
   }
+
+  static async getMoviesByActorId(id: number) {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${
+        import.meta.env.VITE_APP_APY_KEY
+      }`,
+      {
+        params: {
+          language: 'en-US',
+        },
+      }
+    );
+    return response;
+  }
 }
 
 // export type TGetPopular = typeof MoviesService.getPopular;

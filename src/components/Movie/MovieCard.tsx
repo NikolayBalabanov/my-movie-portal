@@ -26,9 +26,11 @@ export default function MovieCard({ movie, isListItem }: IMovieCard) {
       </span>
       <div className="overflow-hidden h-full rounded-lg relative ">
         <img className="card-img" src={movieImg} alt={movie.title} />
-        <span className="absolute bottom-0 left-0 sm:px-4 sm:py-2 py-0 px-2 rounded-md text-center text-gray-100 md:font-black font-normal text-base bg-slate-500">
-          {movie.release_date ? movie.release_date.slice(0, 4) : ''}
-        </span>
+        {movie.release_date && (
+          <span className="absolute bottom-0 left-0 sm:px-4 sm:py-2 py-0 px-2 rounded-md text-center text-gray-100 md:font-black font-normal text-base bg-slate-500">
+            {movie.release_date.slice(0, 4)}
+          </span>
+        )}
       </div>
       <h3 className="text-center text-gray-200 sm:font-black text-base is-short font-normal ">
         {movie ? movie.original_title : ''}

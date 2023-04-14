@@ -25,7 +25,6 @@ export const getActorMovies = (movieId: number) => {
       dispatch({ type: EActionTypes.FETCH_ACTOR_MOVIES });
       const response = await ActorsService.getMoviesByActorId(movieId);
       const actorsByMovie: IMovie[] = response.data.cast;
-      console.log('ACTORS MOVIE', response);
       dispatch({ type: EActionTypes.FETCH_ACTOR_MOVIES_SUCCESS, payload: actorsByMovie });
     } catch (e) {
       dispatch({

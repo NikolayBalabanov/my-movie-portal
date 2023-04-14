@@ -12,7 +12,7 @@ export default class Nav extends Component {
       <nav className="">
         <ul className="list-none flex">
           <NavItem
-            className="mr-3 font-bold text-xl  hover:text-red-400 transition-colors"
+            className="mr-3 px-4 font-bold text-xl hover:text-red-400 transition-colors"
             title="actors"
             to="/actors"
           />

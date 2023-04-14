@@ -1,7 +1,6 @@
 # my-movie-portal
 Movie and actors catalog
 
-# pomodoro-time-tracker
 ## [Demo link](https://movie-portal-react.netlify.app/)
 
 ## Stack:

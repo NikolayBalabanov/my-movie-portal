@@ -8,7 +8,7 @@
   }
 
   .select-item {
-    @apply relative z-20 flex items-center justify-between w-[200px] px-[15px] sm:py-[12px] py-3 text-gray-400 text-base leading-4 bg-slate-200 outline-none hover:bg-gray-400 focus-visible:bg-gray-400 hover:text-gray-200 focus-visible:text-gray-200 transition-colors duration-200;
+    @apply relative z-20 flex items-center justify-between w-[200px] px-[15px] sm:py-[12px] py-3 text-gray-700 text-base leading-4 bg-slate-200 outline-none hover:bg-gray-400 focus-visible:bg-gray-400 hover:text-gray-200 focus-visible:text-gray-200 transition-colors duration-200;
   }
 
   .select-item:not(:last-child) {
